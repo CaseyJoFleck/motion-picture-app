@@ -1,0 +1,27 @@
+// Importing external CSS code, fonts, etc.
+@import url("https://fonts.googleapis.com/css2?family=Quattrocento+Sans:ital,wght@0,400;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap");
+
+.myapp {
+  @apply h-screen bg-green-50 text-black;
+}
+
+.content {
+  @apply w-3/4 mx-auto text-center pt-5;
+}
+
+.h1 {
+  @apply md:text-7xl text-5xl pb-5;
+}
+
+.input {
+  @apply w-full text-gray-900 px-4 py-2 text-center rounded shadow-xl;
+}
+
+.existingMovie {
+  @apply py-4 border border-gray-300 bg-green-50 shadow-lg;
+}
+
+.existingMovie.watched {
+  @apply line-through;
+}
