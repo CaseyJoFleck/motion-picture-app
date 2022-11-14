@@ -1,10 +1,9 @@
 import styles from "../styles/styles.module.scss";
-import { useState } from "react";
+import { Component, CSSProperties, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import cx from "classnames";
-
+import AsyncSelect from "react-select/async";
 const Home = () => {
-  const [movie, setMovie] = useState("");
   const [existingMovies, setExistingMovies] = useState([
     {
       id: uuidv4(),
@@ -28,7 +27,36 @@ const Home = () => {
     },
   ]);
 
-  const handleToggle = (id: string) => {
+  const [fromDatabases, setFromDatabase] = useState([
+    {
+      id: uuidv4(),
+      value: "TEST 1",
+      label: "TEST 1",
+      watched: false,
+    },
+    {
+      id: uuidv4(),
+      value: "TEST 2",
+      label: "TEST 2",
+      watched: true,
+    },
+    {
+      id: uuidv4(),
+      value: "TEST 3",
+      label: "TEST 3",
+      watched: false,
+    },
+    {
+      id: uuidv4(),
+      value: "TEST 4",
+      label: "TEST 4",
+      watched: true,
+    },
+  ]);
+
+  const [movie, setMovie] = useState("");
+
+  const handleToggle = (id) => {
     const _existingMovies = existingMovies.map((existingMovie) => {
       if (existingMovie.id === id) {
         return {
@@ -41,13 +69,31 @@ const Home = () => {
     setExistingMovies(_existingMovies);
   };
 
-  const handleAdd = (event: { key: string }) => {
+  const handleAdd = (event) => {
     if (event.key === "Enter") {
       setExistingMovies([
         { id: uuidv4(), movie_name: movie, watched: false },
         ...existingMovies,
       ]);
-      setMovie("");
+    }
+  };
+
+  const filterMovies = (inputValue) =>
+    fromDatabases.filter((fromDatabase) =>
+      fromDatabase.label.toLowerCase().includes(inputValue.toLowerCase())
+    );
+
+  const loadOptions = (inputValue) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        return resolve(filterMovies(inputValue));
+      }, 100);
+    });
+  };
+
+  const handleInputChange = async (inputValue, { action }) => {
+    if (action !== "set-value") {
+      setMovie(inputValue);
     }
   };
 
@@ -56,13 +102,13 @@ const Home = () => {
       <h1 className={styles.h1}>Fleck Family Movies</h1>
       <div>
         <div>
-          <input
-            type="text"
-            className={styles.input}
-            placeholder="Movies, TV Shows, etc."
-            value={movie}
-            onChange={(e) => setMovie(e.target.value)}
-            onKeyDown={handleAdd}
+          <AsyncSelect
+            isMulti
+            closeMenuOnSelect={false}
+            inputValue={movie}
+            onInputChange={handleInputChange}
+            loadOptions={loadOptions}
+            cacheOptions={true}
           />
         </div>
 
