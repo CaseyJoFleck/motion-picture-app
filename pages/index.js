@@ -2,7 +2,8 @@ import styles from "../styles/styles.module.scss";
 import { Component, CSSProperties, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import cx from "classnames";
-import AsyncSelect from "react-select/async";
+import { ReactSearchAutocomplete } from "react-search-autocomplete";
+
 const Home = () => {
   const [existingMovies, setExistingMovies] = useState([
     {
@@ -27,32 +28,28 @@ const Home = () => {
     },
   ]);
 
-  const [fromDatabases, setFromDatabase] = useState([
+  const movieItems = [
     {
-      id: uuidv4(),
-      value: "TEST 1",
-      label: "TEST 1",
-      watched: false,
+      id: 0,
+      title: "Titanic",
+      description: "A movie about love",
     },
     {
-      id: uuidv4(),
-      value: "TEST 2",
-      label: "TEST 2",
-      watched: true,
+      id: 1,
+      title: "Dead Poets Society",
+      description: "A movie about poetry and the meaning of life",
     },
     {
-      id: uuidv4(),
-      value: "TEST 3",
-      label: "TEST 3",
-      watched: false,
+      id: 2,
+      title: "Terminator 2",
+      description: "A robot from the future is sent back in time",
     },
     {
-      id: uuidv4(),
-      value: "TEST 4",
-      label: "TEST 4",
-      watched: true,
+      id: 3,
+      title: "Alien 2",
+      description: "Ripley is back for a new adventure",
     },
-  ]);
+  ];
 
   const [movie, setMovie] = useState("");
 
@@ -78,23 +75,23 @@ const Home = () => {
     }
   };
 
-  const filterMovies = (inputValue) =>
-    fromDatabases.filter((fromDatabase) =>
-      fromDatabase.label.toLowerCase().includes(inputValue.toLowerCase())
-    );
-
-  const loadOptions = (inputValue) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        return resolve(filterMovies(inputValue));
-      }, 100);
-    });
+  const handleOnSearch = (string, results) => {
+    // console.log("Onsearch", string, results);
   };
 
-  const handleInputChange = async (inputValue, { action }) => {
-    if (action !== "set-value") {
-      setMovie(inputValue);
-    }
+  const handleOnSelect = (item) => {
+    setExistingMovies([
+      { id: uuidv4(), movie_name: item.title, watched: false },
+      ...existingMovies,
+    ]);
+  };
+
+  const formatResult = (item) => {
+    return (
+      <div className="result-wrapper">
+        <span className="result-span">{item.title}</span>
+      </div>
+    );
   };
 
   return (
@@ -102,13 +99,23 @@ const Home = () => {
       <h1 className={styles.h1}>Fleck Family Movies</h1>
       <div>
         <div>
-          <AsyncSelect
-            isMulti
-            closeMenuOnSelect={false}
-            inputValue={movie}
-            onInputChange={handleInputChange}
-            loadOptions={loadOptions}
-            cacheOptions={true}
+          <ReactSearchAutocomplete
+            items={movieItems}
+            value={movie}
+            //onChange={(e) => setMovie(e.target.value)}
+            fuseOptions={{ keys: ["title", "description"] }} // Search on both fields
+            resultStringKeyName="title" // String to display in the results
+            onSearch={handleOnSearch}
+            //onHover={handleOnHover}
+            onSelect={handleOnSelect}
+            // onFocus={handleOnFocus}
+            // onClear={handleOnClear}
+            //showItemsOnFocus={true}
+            inputSearchString={movie}
+            styling={{ zIndex: 1, fontSize: "calc(16px + 0.4vw)" }}
+            formatResult={formatResult}
+            placeholder={"Movies, Shows, Actors..."}
+            autoFocus
           />
         </div>
 
