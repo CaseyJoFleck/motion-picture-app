@@ -10,46 +10,33 @@ const Home = () => {
       id: uuidv4(),
       movie_name: "Movie 1",
       watched: false,
+      tmd_id: uuidv4(),
+      description: "description",
     },
     {
       id: uuidv4(),
       movie_name: "Movie 2",
       watched: true,
+      tmd_id: uuidv4(),
+      description: "description",
     },
     {
       id: uuidv4(),
       movie_name: "Movie 3",
       watched: false,
+      tmd_id: uuidv4(),
+      description: "description",
     },
     {
       id: uuidv4(),
       movie_name: "Movie 4",
       watched: true,
+      tmd_id: uuidv4(),
+      description: "description",
     },
   ]);
 
-  const movieItems = [
-    {
-      id: 0,
-      title: "Titanic",
-      description: "A movie about love",
-    },
-    {
-      id: 1,
-      title: "Dead Poets Society",
-      description: "A movie about poetry and the meaning of life",
-    },
-    {
-      id: 2,
-      title: "Terminator 2",
-      description: "A robot from the future is sent back in time",
-    },
-    {
-      id: 3,
-      title: "Alien 2",
-      description: "Ripley is back for a new adventure",
-    },
-  ];
+  const [searchResults, setSearchResults] = useState([]);
 
   const [movie, setMovie] = useState("");
 
@@ -66,24 +53,37 @@ const Home = () => {
     setExistingMovies(_existingMovies);
   };
 
-  const handleAdd = (event) => {
-    if (event.key === "Enter") {
-      setExistingMovies([
-        { id: uuidv4(), movie_name: movie, watched: false },
-        ...existingMovies,
-      ]);
-    }
-  };
-
-  const handleOnSearch = (string, results) => {
-    // console.log("Onsearch", string, results);
+  const handleOnSearch = async (string, results) => {
+    try {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/search/multi?api_key=***REMOVED***&language=en-US&page=1&query=` +
+          string
+      );
+      const data = await res.json();
+      const updatedOptions = data.results.map((p) => {
+        return {
+          id: uuidv4(),
+          title: p.name === undefined ? p.title : p.name,
+          tmd_id: p.id,
+          description: p.overview,
+        };
+      });
+      setSearchResults(updatedOptions);
+    } catch (err) {}
   };
 
   const handleOnSelect = (item) => {
     setExistingMovies([
-      { id: uuidv4(), movie_name: item.title, watched: false },
+      {
+        id: uuidv4(),
+        movie_name: item.title,
+        watched: false,
+        tmd_id: item.tmd_id,
+        description: item.description,
+      },
       ...existingMovies,
     ]);
+    setMovie(" ");
   };
 
   const formatResult = (item) => {
@@ -100,17 +100,13 @@ const Home = () => {
       <div>
         <div>
           <ReactSearchAutocomplete
-            items={movieItems}
-            value={movie}
+            items={searchResults}
+            //  value={movie}
             //onChange={(e) => setMovie(e.target.value)}
-            fuseOptions={{ keys: ["title", "description"] }} // Search on both fields
+            fuseOptions={{ keys: ["title"] }} // Search on both fields
             resultStringKeyName="title" // String to display in the results
             onSearch={handleOnSearch}
-            //onHover={handleOnHover}
             onSelect={handleOnSelect}
-            // onFocus={handleOnFocus}
-            // onClear={handleOnClear}
-            //showItemsOnFocus={true}
             inputSearchString={movie}
             styling={{ zIndex: 1, fontSize: "calc(16px + 0.4vw)" }}
             formatResult={formatResult}
