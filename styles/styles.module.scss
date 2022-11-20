@@ -1,17 +1,17 @@
-// Importing external CSS code, fonts, etc.
-@import url("https://fonts.googleapis.com/css2?family=Quattrocento+Sans:ital,wght@0,400;0,700;1,400&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap");
+// // Importing external CSS code, fonts, etc.
+// @import url("https://fonts.googleapis.com/css2?family=Quattrocento+Sans:ital,wght@0,400;0,700;1,400&display=swap");
+// @import url("https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap");
 
-.myapp {
-  @apply h-screen bg-green-50 text-black;
-}
+// .myapp {
+//   @apply h-screen bg-white;
+// }
 
 .content {
   @apply w-3/4 mx-auto text-center pt-5;
 }
 
-.h1 {
-  @apply lg:text-9xl md:text-7xl text-5xl pb-5;
+.search {
+  @apply pt-5;
 }
 
 .input {
@@ -19,7 +19,7 @@
 }
 
 .existingMovie {
-  @apply py-4 border border-gray-300 bg-green-50 shadow-lg;
+  @apply py-4 border border-gray-300 bg-white shadow-lg;
 }
 
 .existingMovie.watched {
