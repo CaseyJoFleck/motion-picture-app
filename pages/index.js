@@ -57,8 +57,7 @@ const Home = () => {
   const handleOnSearch = async (string, results) => {
     try {
       const res = await fetch(
-        `https://api.themoviedb.org/3/search/multi?api_key=***REMOVED***&language=en-US&page=1&include_adult=false&query=` +
-          string
+        `https://api.themoviedb.org/3/search/multi?api_key=***REMOVED***&language=en-US&page=1&include_adult=false&query=${string}`
       );
       const data = await res.json();
       const updatedOptions = data.results
