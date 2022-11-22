@@ -1,9 +1,9 @@
 import styles from "../styles/styles.module.scss";
 import { Component, CSSProperties, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import cx from "classnames";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
-import Header from "./Header.js";
+import Header from "./components/Header.js";
+import Table from "./components/Table.js";
 
 const Home = () => {
   const [existingMovies, setExistingMovies] = useState([
@@ -121,33 +121,7 @@ const Home = () => {
 
           <br />
 
-          <ul>
-            {existingMovies
-              .filter(({ watched }) => !watched)
-              .map(({ id, movie_name, watched }) => (
-                <li
-                  key={id}
-                  onClick={() => handleToggle(id)}
-                  className={cx(styles.existingMovie)}
-                >
-                  {movie_name}
-                </li>
-              ))}
-          </ul>
-
-          <ul>
-            {existingMovies
-              .filter(({ watched }) => watched)
-              .map(({ id, movie_name, watched }) => (
-                <li
-                  key={id}
-                  onClick={() => handleToggle(id)}
-                  className={cx(styles.existingMovie, styles.watched)}
-                >
-                  {movie_name}
-                </li>
-              ))}
-          </ul>
+          <Table existingMovies={existingMovies} handleToggle={handleToggle} />
         </div>
       </div>
     </>
