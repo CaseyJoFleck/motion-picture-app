@@ -1,45 +1,90 @@
 import styles from "../styles/styles.module.scss";
-import { Component, CSSProperties, useState } from "react";
+import {
+  Component,
+  CSSProperties,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import Header from "./components/Header.js";
 import Table from "./components/Table.js";
 
 const Home = () => {
-  const [existingMovies, setExistingMovies] = useState([
-    {
-      id: uuidv4(),
-      movie_name: "Movie 1",
-      watched: false,
-      tmd_id: uuidv4(),
-      description: "description",
-    },
-    {
-      id: uuidv4(),
-      movie_name: "Movie 2",
-      watched: true,
-      tmd_id: uuidv4(),
-      description: "description",
-    },
-    {
-      id: uuidv4(),
-      movie_name: "Movie 3",
-      watched: false,
-      tmd_id: uuidv4(),
-      description: "description",
-    },
-    {
-      id: uuidv4(),
-      movie_name: "Movie 4",
-      watched: true,
-      tmd_id: uuidv4(),
-      description: "description",
-    },
-  ]);
+  const [existingMovies, setExistingMovies] = useState([]);
 
   const [searchResults, setSearchResults] = useState([]);
 
   const [movie, setMovie] = useState("");
+
+  const [streamingServices, setStreamingServices] = useState({
+    flatrate: [],
+    rent: [],
+    buy: [],
+  });
+
+  const [streamingVariables, setStreamingVariables] = useState({
+    tmd_id: "",
+    media_type: "",
+  });
+
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const getStreamingServices = useCallback(
+    async ({ tmd_id, media_type }) => {
+      const url =
+        media_type === "movie"
+          ? `https://api.themoviedb.org/3/movie/${tmd_id}/watch/providers?api_key=***REMOVED***`
+          : `https://api.themoviedb.org/3/tv/${tmd_id}/watch/providers?api_key=***REMOVED***`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const _flatrate = data.results.US.flatrate.map(
+        ({ provider_name, logo_path }) => {
+          return {
+            name: provider_name,
+            logo_path: `https://image.tmdb.org/t/p/${logo_path}`,
+          };
+        }
+      );
+
+      const _rent = data.results.US.rent.map(({ provider_name, logo_path }) => {
+        return {
+          name: provider_name,
+          logo_path: `https://image.tmdb.org/t/p/${logo_path}`,
+        };
+      });
+
+      const _buy = data.results.US.buy.map(({ provider_name, logo_path }) => {
+        return {
+          name: provider_name,
+          logo_path: `https://image.tmdb.org/t/p/${logo_path}`,
+        };
+      });
+
+      const _streaming_services = {
+        flatrate: [_flatrate],
+        rent: [_rent],
+        buy: [_buy],
+      };
+
+      const _existingMovies = existingMovies.map((existingMovie) => {
+        if (existingMovie.tmd_id === tmd_id) {
+          return {
+            ...existingMovie,
+            streaming_services: _streaming_services,
+          };
+        }
+        return existingMovie;
+      });
+      setExistingMovies(_existingMovies);
+    },
+    [streamingServices]
+  );
+
+  useEffect(() => {
+    getStreamingServices(streamingVariables).catch(console.error);
+  }, [getStreamingServices, isSubscribed, streamingVariables]);
 
   const handleToggle = (id) => {
     const _existingMovies = existingMovies.map((existingMovie) => {
@@ -66,8 +111,13 @@ const Home = () => {
           return {
             id: uuidv4(),
             title: p.name === undefined ? p.title : p.name,
+            media_type: p.media_type,
             tmd_id: p.id,
             description: p.overview,
+            release_date: p.release_date,
+            image: p.poster_path
+              ? `https://image.tmdb.org/t/p/${p.poster_path}`
+              : "",
           };
         });
       setSearchResults(updatedOptions);
@@ -79,18 +129,25 @@ const Home = () => {
       {
         id: uuidv4(),
         movie_name: item.title,
-        watched: false,
         tmd_id: item.tmd_id,
         description: item.description,
+        release_date: item.release_date,
+        family_likes: 0,
+        image_url: item.image,
+        media_type: item.media_type,
+        streaming_services: streamingServices,
       },
       ...existingMovies,
     ]);
+    setStreamingVariables({ tmd_id: item.tmd_id, media_type: item.media_type });
   };
 
   const formatResult = (item) => {
     return (
       <div className="result-wrapper">
-        <span className="result-span">{item.title}</span>
+        <span className="result-span">
+          {item.title}&nbsp;({item.media_type})
+        </span>
       </div>
     );
   };
@@ -99,21 +156,18 @@ const Home = () => {
     <>
       <Header />
       <div className={styles.content}>
-        {/* <h1 className={styles.h1}>Fleck Family Movies</h1> */}
         <div className={styles.search}>
           <div>
             <ReactSearchAutocomplete
               items={searchResults}
-              //  value={movie}
-              //onChange={(e) => setMovie(e.target.value)}
-              fuseOptions={{ keys: ["title"] }} // Search on both fields
-              resultStringKeyName="title" // String to display in the results
+              fuseOptions={{ keys: ["title"] }}
+              resultStringKeyName="title"
               onSearch={handleOnSearch}
               onSelect={handleOnSelect}
               inputSearchString={movie}
               styling={{ zIndex: 1 }}
               formatResult={formatResult}
-              placeholder={"Movies, Shows, Actors..."}
+              placeholder={"Search Movies or Shows"}
               autoFocus
             />
           </div>
