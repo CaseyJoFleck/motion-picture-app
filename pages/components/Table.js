@@ -15,12 +15,27 @@ function renderCellExpand(params) {
 
 const Table = ({ existingMovies, handleToggle }) => {
   const rows = existingMovies.map(
-    ({ id, description, movie_name, watched }) => {
+    ({
+      id,
+      movie_name,
+      description,
+      release_date,
+      family_likes,
+      image_url,
+      media_type,
+      streaming_services,
+    }) => {
       return {
         id: id,
         col1: movie_name,
         col2: description,
-        col3: watched ? "Yes" : "No",
+        col3: release_date,
+        col4: family_likes,
+        col5: image_url,
+        col6: media_type,
+        col7: streaming_services.flatrate.map(({ name }) => name).join(", "),
+        col8: streaming_services.rent.map(({ name }) => name).join(", "),
+        col9: streaming_services.buy.map(({ name }) => name).join(", "),
       };
     }
   );
@@ -33,7 +48,28 @@ const Table = ({ existingMovies, handleToggle }) => {
       minWidth: 200,
       renderCell: renderCellExpand,
     },
-    { field: "col3", headerName: "Watched?", width: 150 },
+    { field: "col3", headerName: "Release Date", width: 150 },
+    { field: "col4", headerName: "Family Likes", width: 150 },
+    { field: "col5", headerName: "Image URL", width: 150 },
+    { field: "col6", headerName: "Movie or TV?", width: 150 },
+    {
+      field: "col7",
+      headerName: "Included",
+      width: 200,
+      height: 200,
+    },
+    {
+      field: "col8",
+      headerName: "Rent",
+      width: 200,
+      height: 200,
+    },
+    {
+      field: "col9",
+      headerName: "Buy",
+      width: 200,
+      height: 200,
+    },
   ];
 
   return (
