@@ -13,7 +13,7 @@ function renderCellExpand(params) {
   );
 }
 
-const Table = ({ existingMovies, handleToggle }) => {
+const Table = ({ existingMovies }) => {
   const rows = existingMovies.map(
     ({
       id,
@@ -33,9 +33,9 @@ const Table = ({ existingMovies, handleToggle }) => {
         col4: family_likes,
         col5: image_url,
         col6: media_type,
-        col7: streaming_services.flatrate.map(({ name }) => name).join(", "),
-        col8: streaming_services.rent.map(({ name }) => name).join(", "),
-        col9: streaming_services.buy.map(({ name }) => name).join(", "),
+        col7: streaming_services.flatrate[0].map(({ name }) => name).join(", "),
+        col8: streaming_services.rent[0].map(({ name }) => name).join(", "),
+        col9: streaming_services.buy[0].map(({ name }) => name).join(", "),
       };
     }
   );
@@ -56,19 +56,19 @@ const Table = ({ existingMovies, handleToggle }) => {
       field: "col7",
       headerName: "Included",
       width: 200,
-      height: 200,
+      renderCell: renderCellExpand,
     },
     {
       field: "col8",
       headerName: "Rent",
       width: 200,
-      height: 200,
+      renderCell: renderCellExpand,
     },
     {
       field: "col9",
       headerName: "Buy",
       width: 200,
-      height: 200,
+      renderCell: renderCellExpand,
     },
   ];
 
