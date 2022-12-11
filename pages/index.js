@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import Header from "./components/Header.js";
 import Table from "./components/Table.js";
+import { resolve } from "path";
 
 const Home = () => {
   const [existingMovies, setExistingMovies] = useState([]);
@@ -18,49 +19,49 @@ const Home = () => {
 
   const [movie, setMovie] = useState("");
 
-  const [streamingServices, setStreamingServices] = useState({
-    flatrate: [],
-    rent: [],
-    buy: [],
-  });
+  const [streamingServices, setStreamingServices] = useState({});
 
-  const [streamingVariables, setStreamingVariables] = useState({
-    tmd_id: "",
-    media_type: "",
-  });
-
-  const [isSubscribed, setIsSubscribed] = useState(false);
-
-  const getStreamingServices = useCallback(
-    async ({ tmd_id, media_type }) => {
+  const getStreamingServices = async (tmd_id, media_type) => {
+    try {
       const url =
         media_type === "movie"
           ? `https://api.themoviedb.org/3/movie/${tmd_id}/watch/providers?api_key=***REMOVED***`
           : `https://api.themoviedb.org/3/tv/${tmd_id}/watch/providers?api_key=***REMOVED***`;
       const res = await fetch(url);
       const data = await res.json();
-      const _flatrate = data.results.US.flatrate.map(
-        ({ provider_name, logo_path }) => {
+
+      var _flatrate = [];
+      var _rent = [];
+      var _buy = [];
+
+      if (data.results.US.flatrate) {
+        _flatrate = data.results.US.flatrate.map(
+          ({ provider_name, logo_path }) => {
+            return {
+              name: provider_name,
+              logo_path: `https://image.tmdb.org/t/p/${logo_path}`,
+            };
+          }
+        );
+      }
+
+      if (data.results.US.rent) {
+        _rent = data.results.US.rent.map(({ provider_name, logo_path }) => {
           return {
             name: provider_name,
             logo_path: `https://image.tmdb.org/t/p/${logo_path}`,
           };
-        }
-      );
+        });
+      }
 
-      const _rent = data.results.US.rent.map(({ provider_name, logo_path }) => {
-        return {
-          name: provider_name,
-          logo_path: `https://image.tmdb.org/t/p/${logo_path}`,
-        };
-      });
-
-      const _buy = data.results.US.buy.map(({ provider_name, logo_path }) => {
-        return {
-          name: provider_name,
-          logo_path: `https://image.tmdb.org/t/p/${logo_path}`,
-        };
-      });
+      if (data.results.US.buy) {
+        _buy = data.results.US.buy.map(({ provider_name, logo_path }) => {
+          return {
+            name: provider_name,
+            logo_path: `https://image.tmdb.org/t/p/${logo_path}`,
+          };
+        });
+      }
 
       const _streaming_services = {
         flatrate: [_flatrate],
@@ -68,35 +69,10 @@ const Home = () => {
         buy: [_buy],
       };
 
-      const _existingMovies = existingMovies.map((existingMovie) => {
-        if (existingMovie.tmd_id === tmd_id) {
-          return {
-            ...existingMovie,
-            streaming_services: _streaming_services,
-          };
-        }
-        return existingMovie;
-      });
-      setExistingMovies(_existingMovies);
-    },
-    [streamingServices]
-  );
-
-  useEffect(() => {
-    getStreamingServices(streamingVariables).catch(console.error);
-  }, [getStreamingServices, isSubscribed, streamingVariables]);
-
-  const handleToggle = (id) => {
-    const _existingMovies = existingMovies.map((existingMovie) => {
-      if (existingMovie.id === id) {
-        return {
-          ...existingMovie,
-          watched: !existingMovie.watched,
-        };
-      }
-      return existingMovie;
-    });
-    setExistingMovies(_existingMovies);
+      return _streaming_services;
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleOnSearch = async (string, results) => {
@@ -124,7 +100,9 @@ const Home = () => {
     } catch (err) {}
   };
 
-  const handleOnSelect = (item) => {
+  const handleOnSelect = async (item) => {
+    const streamers = await getStreamingServices(item.tmd_id, item.media_type);
+
     setExistingMovies([
       {
         id: uuidv4(),
@@ -135,11 +113,10 @@ const Home = () => {
         family_likes: 0,
         image_url: item.image,
         media_type: item.media_type,
-        streaming_services: streamingServices,
+        streaming_services: streamers,
       },
       ...existingMovies,
     ]);
-    setStreamingVariables({ tmd_id: item.tmd_id, media_type: item.media_type });
   };
 
   const formatResult = (item) => {
@@ -174,7 +151,7 @@ const Home = () => {
 
           <br />
 
-          <Table existingMovies={existingMovies} handleToggle={handleToggle} />
+          <Table existingMovies={existingMovies} />
         </div>
       </div>
     </>
