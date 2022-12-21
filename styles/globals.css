@@ -5,6 +5,18 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+.css-1e2bxag-MuiDataGrid-root
+  .MuiDataGrid-row:not(.MuiDataGrid-row--dynamicHeight)
+  > .MuiDataGrid-cell {
+  overflow: hidden !important;
+  white-space: unset !important;
+  text-overflow: ellipsis !important;
+}
+
+.wrapper {
+  z-index: 7 !important;
+}
+
 .watched {
   text-decoration: line-through;
 }

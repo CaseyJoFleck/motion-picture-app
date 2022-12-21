@@ -90,9 +90,14 @@ const Home = () => {
             media_type: p.media_type,
             tmd_id: p.id,
             description: p.overview,
-            release_date: p.release_date,
+            release_date:
+              p.release_date !== undefined
+                ? p.release_date
+                : p.first_air_date !== undefined
+                ? p.first_air_date
+                : "",
             image: p.poster_path
-              ? `https://image.tmdb.org/t/p/${p.poster_path}`
+              ? `https://image.tmdb.org/t/p/w500${p.poster_path}`
               : "",
           };
         });
@@ -120,10 +125,16 @@ const Home = () => {
   };
 
   const formatResult = (item) => {
+    var date =
+      item.release_date !== undefined
+        ? `${item.release_date}`.substring(0, 4)
+        : item.first_air_date !== undefined
+        ? `${item.first_air_date}`.substring(0, 4)
+        : "";
     return (
       <div className="result-wrapper">
         <span className="result-span">
-          {item.title}&nbsp;({item.media_type})
+          {item.title}&nbsp;({item.media_type})&nbsp;({date})
         </span>
       </div>
     );
