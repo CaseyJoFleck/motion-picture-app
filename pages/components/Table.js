@@ -4,6 +4,7 @@ import * as React from "react";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import GridCellExpand from "./GridCellExpand.js";
 import Image from "next/image";
+import { BiLike, BiTrash } from "react-icons/bi";
 
 function renderCellExpand(params) {
   return (
@@ -18,7 +19,7 @@ const myLoader = ({ src, width, quality }) => {
   return `${src}`;
 };
 
-const Table = ({ existingMovies }) => {
+const Table = ({ existingMovies, handleLikes, handleDelete }) => {
   const rows = existingMovies.map(
     ({
       id,
@@ -38,7 +39,7 @@ const Table = ({ existingMovies }) => {
     }) => {
       return {
         id: id,
-        col1: family_likes,
+        col1: { family_likes: family_likes, id: id },
         col2: image_url,
         col3: movie_name,
         col4: media_type,
@@ -55,12 +56,27 @@ const Table = ({ existingMovies }) => {
           .join(", "),
         col14: streaming_services.rent[0].map(({ name }) => name).join(", "),
         col15: streaming_services.buy[0].map(({ name }) => name).join(", "),
+        col16: id,
       };
     }
   );
 
   const columns = [
-    { field: "col1", headerName: "Family Likes", width: 100, align: "center" },
+    {
+      field: "col1",
+      headerName: "Family Likes",
+      width: 100,
+      align: "center",
+      renderCell: (params) => {
+        return (
+          <>
+            <button onClick={() => handleLikes(params.value.id)}>
+              <BiLike className="icon" /> {params.value.family_likes}
+            </button>
+          </>
+        );
+      },
+    },
     {
       field: "col2",
       headerName: "Poster",
@@ -72,7 +88,7 @@ const Table = ({ existingMovies }) => {
               unoptimized
               loader={myLoader}
               src={params.value}
-              alt="Picture of the author"
+              alt="Picture of the poster"
               width={500}
               height={500}
             />
@@ -109,6 +125,21 @@ const Table = ({ existingMovies }) => {
       field: "col15",
       headerName: "Buy",
       width: 200,
+    },
+    {
+      field: "col16",
+      headerName: "Delete?",
+      width: 100,
+      align: "center",
+      renderCell: (params) => {
+        return (
+          <>
+            <button onClick={() => handleDelete(params.value)}>
+              <BiTrash className="icon" />
+            </button>
+          </>
+        );
+      },
     },
   ];
 
