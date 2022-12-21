@@ -21,6 +21,46 @@ const Home = () => {
 
   const [streamingServices, setStreamingServices] = useState({});
 
+  const getGenreAndRatings = async (title, year, media_type) => {
+    try {
+      const options = {
+        method: "GET",
+        headers: {
+          "X-RapidAPI-Key":
+            "***REMOVED***",
+          "X-RapidAPI-Host": "movie-database-alternative.p.rapidapi.com",
+        },
+      };
+
+      const url = `https://movie-database-alternative.p.rapidapi.com/?s=${title}&r=json&page=1`;
+      const res = await fetch(url, options);
+      const data = await res.json();
+      const imdbId = data.Search.filter(({ Title }) => Title === title).map(
+        (p) => p.imdbID
+      )[0];
+
+      if (imdbId === undefined) {
+        return undefined;
+      }
+
+      const urlMovie = `https://movie-database-alternative.p.rapidapi.com/?r=json&i=${imdbId}`;
+      const resMovie = await fetch(urlMovie, options);
+      const d = await resMovie.json();
+
+      const movieData = {
+        contentRating: d.Rated,
+        genre: d.Genre,
+        director: d.Director,
+        actors: d.Actors,
+        runtime: d.Runtime,
+        imdbRating: d.imdbRating + "/10",
+      };
+      return movieData;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const getStreamingServices = async (tmd_id, media_type) => {
     try {
       const url =
@@ -106,7 +146,19 @@ const Home = () => {
   };
 
   const handleOnSelect = async (item) => {
+    const date =
+      item.release_date !== undefined
+        ? item.release_date
+        : item.first_air_date !== undefined
+        ? item.first_air_date
+        : "";
+
     const streamers = await getStreamingServices(item.tmd_id, item.media_type);
+    const otherFields = await getGenreAndRatings(
+      item.title,
+      `${date}`.substring(0, 4),
+      item.media_type
+    );
 
     setExistingMovies([
       {
@@ -119,6 +171,12 @@ const Home = () => {
         image_url: item.image,
         media_type: item.media_type,
         streaming_services: streamers,
+        content_rating: otherFields ? otherFields.contentRating : "",
+        genre: otherFields ? otherFields.genre : "",
+        director: otherFields ? otherFields.director : "",
+        actors: otherFields ? otherFields.actors : "",
+        runtime: otherFields ? otherFields.runtime : "",
+        imdbRating: otherFields ? otherFields.imdbRating : "",
       },
       ...existingMovies,
     ]);

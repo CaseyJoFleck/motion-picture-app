@@ -29,32 +29,47 @@ const Table = ({ existingMovies }) => {
       image_url,
       media_type,
       streaming_services,
+      content_rating,
+      genre,
+      director,
+      actors,
+      runtime,
+      imdbRating,
     }) => {
       return {
         id: id,
         col1: family_likes,
         col2: image_url,
         col3: movie_name,
-        col4: description,
-        col5: release_date,
-        col6: media_type,
-        col7: streaming_services.flatrate[0].map(({ name }) => name).join(", "),
-        col8: streaming_services.rent[0].map(({ name }) => name).join(", "),
-        col9: streaming_services.buy[0].map(({ name }) => name).join(", "),
+        col4: media_type,
+        col5: content_rating,
+        col6: genre,
+        col7: imdbRating,
+        col8: description,
+        col9: runtime,
+        col10: release_date,
+        col11: actors,
+        col12: director,
+        col13: streaming_services.flatrate[0]
+          .map(({ name }) => name)
+          .join(", "),
+        col14: streaming_services.rent[0].map(({ name }) => name).join(", "),
+        col15: streaming_services.buy[0].map(({ name }) => name).join(", "),
       };
     }
   );
 
   const columns = [
-    { field: "col1", headerName: "Family Likes", width: 150, align: "center" },
+    { field: "col1", headerName: "Family Likes", width: 100, align: "center" },
     {
       field: "col2",
-      headerName: "Image URL",
+      headerName: "Poster",
       width: 150,
       renderCell: (params) => {
         return (
           <>
             <Image
+              unoptimized
               loader={myLoader}
               src={params.value}
               alt="Picture of the author"
@@ -66,26 +81,32 @@ const Table = ({ existingMovies }) => {
       },
     },
     { field: "col3", headerName: "Title", width: 100, align: "center" },
+    { field: "col4", headerName: "Type", width: 80 },
+    { field: "col5", headerName: "Content Rating", width: 120 },
+    { field: "col6", headerName: "Genre", width: 100 },
+    { field: "col7", headerName: "IMDB", width: 100 },
     {
-      field: "col4",
+      field: "col8",
       headerName: "Description",
       width: 150,
       renderCell: renderCellExpand,
     },
-    { field: "col5", headerName: "Release Date", width: 150 },
-    { field: "col6", headerName: "Movie or TV?", width: 150 },
+    { field: "col9", headerName: "Runtime", width: 80 },
+    { field: "col10", headerName: "Release Date", width: 100 },
+    { field: "col11", headerName: "Actors", width: 100 },
+    { field: "col12", headerName: "Directors", width: 100 },
     {
-      field: "col7",
+      field: "col13",
       headerName: "Included",
       width: 200,
     },
     {
-      field: "col8",
+      field: "col14",
       headerName: "Rent",
       width: 200,
     },
     {
-      field: "col9",
+      field: "col15",
       headerName: "Buy",
       width: 200,
     },
