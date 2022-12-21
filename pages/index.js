@@ -21,6 +21,26 @@ const Home = () => {
 
   const [streamingServices, setStreamingServices] = useState({});
 
+  const handleLikes = (id) => {
+    const _existingMovies = existingMovies.map((existingMovie) => {
+      if (existingMovie.id === id) {
+        return {
+          ...existingMovie,
+          family_likes: existingMovie.family_likes + 1,
+        };
+      }
+      return existingMovie;
+    });
+    setExistingMovies(_existingMovies);
+  };
+
+  const handleDelete = (id) => {
+    const _existingMovies = existingMovies.filter(
+      (_existingMovie) => _existingMovie.id !== id
+    );
+    setExistingMovies(_existingMovies);
+  };
+
   const getGenreAndRatings = async (title, year, media_type) => {
     try {
       const options = {
@@ -220,7 +240,11 @@ const Home = () => {
 
           <br />
 
-          <Table existingMovies={existingMovies} />
+          <Table
+            existingMovies={existingMovies}
+            handleLikes={handleLikes}
+            handleDelete={handleDelete}
+          />
         </div>
       </div>
     </>
