@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import Header from "./components/Header.js";
 import Table from "./components/Table.js";
-import { resolve } from "path";
+import Footer from "./components/Footer.js";
 
 const Home = () => {
   const [existingMovies, setExistingMovies] = useState([]);
@@ -247,6 +247,7 @@ const Home = () => {
           />
         </div>
       </div>
+      <Footer />
     </>
   );
 };

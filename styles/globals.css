@@ -5,6 +5,32 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+.footer {
+  margin-top: 100px;
+}
+.footer-div {
+  background-color: aliceblue;
+}
+
+.footer-content {
+  margin-left: auto;
+  margin-right: auto;
+  width: 95%;
+  padding-top: 1.25rem;
+  text-align: left;
+  padding-top: 15px;
+  p {
+    padding-left: 80px;
+    padding-top: 10px;
+    @media (max-width: 599.9px) {
+      padding-left: 25px;
+    }
+  }
+  p:first-of-type {
+    padding-top: 15px;
+  }
+}
+
 .css-1e2bxag-MuiDataGrid-root
   .MuiDataGrid-row:not(.MuiDataGrid-row--dynamicHeight)
   > .MuiDataGrid-cell {
@@ -15,6 +41,23 @@ body {
 
 .wrapper {
   z-index: 7 !important;
+}
+
+.tmd-img {
+  display: block;
+  padding-top: 25px;
+  @media (min-width: 600px) {
+    margin-left: 30px;
+  }
+}
+
+.rapidapi-img {
+  display: block;
+  margin-top: -10px;
+  margin-bottom: -50px;
+  @media (max-width: 599.9px) {
+    margin-left: -30px;
+  }
 }
 
 .watched {
