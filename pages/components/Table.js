@@ -29,7 +29,9 @@ const Table = ({ existingMovies, handleLikes, handleDelete }) => {
       family_likes,
       image_url,
       media_type,
-      streaming_services,
+      included,
+      rent,
+      buy,
       content_rating,
       genre,
       director,
@@ -51,11 +53,9 @@ const Table = ({ existingMovies, handleLikes, handleDelete }) => {
         col10: release_date,
         col11: actors,
         col12: director,
-        col13: streaming_services.flatrate[0]
-          .map(({ name }) => name)
-          .join(", "),
-        col14: streaming_services.rent[0].map(({ name }) => name).join(", "),
-        col15: streaming_services.buy[0].map(({ name }) => name).join(", "),
+        col13: included,
+        col14: rent,
+        col15: buy,
         col16: id,
       };
     }
