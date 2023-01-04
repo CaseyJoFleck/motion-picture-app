@@ -11,29 +11,6 @@ import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import Header from "./components/Header.js";
 import Table from "./components/Table.js";
 import Footer from "./components/Footer.js";
-import * as dotenv from "dotenv";
-dotenv.config();
-import express from "express";
-
-const cors = require("cors");
-const knex = require("knex");
-
-const db = knex({
-  client: "pg",
-  connection: {
-    host: process.env.PGSQL_HOST,
-    user: process.env.PGSQL_USER,
-    password: process.env.PGSQL_PASSWORD,
-    database: process.env.PGSQL_DATABASE,
-    port: process.env.PGSQL_PORT,
-  },
-});
-
-const app = express();
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-// CORS implemented so that we don't get errors when trying to access the server from a different server location
-app.use(cors());
 
 const Home = () => {
   const [existingMovies, setExistingMovies] = useState([]);
@@ -44,38 +21,9 @@ const Home = () => {
 
   const [streamingServices, setStreamingServices] = useState({});
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    const loadData = async () => {
-      db.select("*")
-        .from("motion_picture")
-        .then((data) => {
-          console.log(data);
-          setExistingMovies(res.json(data));
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    };
-    setIsLoading(true);
-    loadData();
-  }, []);
-
   const handleLikes = (id) => {
     const _existingMovies = existingMovies.map((existingMovie) => {
       if (existingMovie.id === id) {
-        db("motion_picture")
-          .where("id", "=", id)
-          .update({ family_likes: existingMovie.family_likes + 1 })
-          .then(() => {
-            console.log("Movie Updated");
-            return res.json({ msg: "Movie Updated" });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
         return {
           ...existingMovie,
           family_likes: existingMovie.family_likes + 1,
@@ -87,16 +35,6 @@ const Home = () => {
   };
 
   const handleDelete = (id) => {
-    db("motion_picture")
-      .where("id", "=", id)
-      .del()
-      .then(() => {
-        return res.json({ msg: "Movie Deleted" });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
     const _existingMovies = existingMovies.filter(
       (_existingMovie) => _existingMovie.id !== id
     );
@@ -155,6 +93,14 @@ const Home = () => {
       var _flatrate = [];
       var _rent = [];
       var _buy = [];
+
+      if (Object.keys(data.results).length === 0) {
+        return {
+          flatrate: [_flatrate],
+          rent: [_rent],
+          buy: [_buy],
+        };
+      }
 
       if (data.results.US.flatrate) {
         _flatrate = data.results.US.flatrate.map(
@@ -242,34 +188,7 @@ const Home = () => {
       item.media_type
     );
 
-    db("motion_picture")
-      .insert({
-        id: uuidv4(),
-        movie_name: item.title,
-        tmd_id: item.tmd_id,
-        description: item.description,
-        release_date: item.release_date,
-        family_likes: 0,
-        image_url: item.image,
-        media_type: item.media_type,
-        included: streamers.flatrate[0].map(({ name }) => name).join(", "),
-        rent: streamers.rent[0].map(({ name }) => name).join(", "),
-        buy: streamers.buy[0].map(({ name }) => name).join(", "),
-        content_rating: otherFields ? otherFields.contentRating : "",
-        genre: otherFields ? otherFields.genre : "",
-        director: otherFields ? otherFields.director : "",
-        actors: otherFields ? otherFields.actors : "",
-        runtime: otherFields ? otherFields.runtime : "",
-        imdbRating: otherFields ? otherFields.imdbRating : "",
-      })
-      .then(() => {
-        console.log("Movie Added");
-        return res.json({ msg: "Movie Added" });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
+    console.log(streamers);
     setExistingMovies([
       {
         id: uuidv4(),
@@ -309,10 +228,6 @@ const Home = () => {
       </div>
     );
   };
-
-  if (isLoading) {
-    return <p>Loading....</p>;
-  }
 
   return (
     <>
