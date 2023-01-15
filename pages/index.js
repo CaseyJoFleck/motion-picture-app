@@ -46,8 +46,7 @@ const Home = () => {
       const options = {
         method: "GET",
         headers: {
-          "X-RapidAPI-Key":
-            "***REMOVED***",
+          "X-RapidAPI-Key": process.env.NEXT_PUBLIC_RAPID_API_KEY,
           "X-RapidAPI-Host": "movie-database-alternative.p.rapidapi.com",
         },
       };
@@ -85,8 +84,8 @@ const Home = () => {
     try {
       const url =
         media_type === "movie"
-          ? `https://api.themoviedb.org/3/movie/${tmd_id}/watch/providers?api_key=***REMOVED***`
-          : `https://api.themoviedb.org/3/tv/${tmd_id}/watch/providers?api_key=***REMOVED***`;
+          ? `https://api.themoviedb.org/3/movie/${tmd_id}/watch/providers?api_key=${process.env.NEXT_PUBLIC_THE_MOVIE_DATABASE_API_KEY}`
+          : `https://api.themoviedb.org/3/tv/${tmd_id}/watch/providers?api_key=${process.env.NEXT_PUBLIC_THE_MOVIE_DATABASE_API_KEY}`;
       const res = await fetch(url);
       const data = await res.json();
 
@@ -146,7 +145,7 @@ const Home = () => {
   const handleOnSearch = async (string, results) => {
     try {
       const res = await fetch(
-        `https://api.themoviedb.org/3/search/multi?api_key=***REMOVED***&language=en-US&page=1&include_adult=false&query=${string}`
+        `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_THE_MOVIE_DATABASE_API_KEY}&language=en-US&page=1&include_adult=false&query=${string}`
       );
       const data = await res.json();
       const updatedOptions = data.results
@@ -188,7 +187,6 @@ const Home = () => {
       item.media_type
     );
 
-    console.log(streamers);
     setExistingMovies([
       {
         id: uuidv4(),
